@@ -11,8 +11,16 @@
 
     const config = {
         type: Phaser.AUTO,
-        width: 800,
+        width: 1200,
         height: 600,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                // 重力を０にしている
+                gravity: false,
+                debug: false
+            }
+        },
         scene: {
             preload: preload,
             create: create,
@@ -20,12 +28,45 @@
         }
     };
 
-    function preload() {
+    let player;
+    let platforms;
+    let iwashi;
 
+    const game = new Phaser.Game(config);
+
+    function preload() {
+        this.load.image('sea', 'assets/sea.png');
+        this.load.image('ebi', 'assets/ebi.png');
+        this.load.image('buri', 'assets/buri.png');
+        this.load.image('eater', 'assets/eater.png');
+        this.load.image('iwashi', 'assets/iwashi.png');
+        this.load.image('hirame', 'assets/hirame.png');
+        this.load.image('kawahagi', 'assets/kawahagi.png');
+        this.load.image('kumanomi', 'assets/kumanomi.png');
     }
 
     function create() {
+        this.add.image(600, 300, 'sea');
 
+        // イワシ
+        iwashi = this.physics.add.sprite(1200, 300, 'iwashi');
+        iwashi.setVelocityX(-150);
+        iwashi.scaleX = iwashi.scaleX / 10;
+        iwashi.scaleY = iwashi.scaleY / 10;
+
+        // ヒラメ
+        hirame = this.physics.add.sprite(1200, 100, 'hirame');
+        hirame.setVelocityX(-100);
+        hirame.scaleX = hirame.scaleX / 5;
+        hirame.scaleY = hirame.scaleY / 5;
+
+
+        player = this.physics.add.sprite(300, 300, 'eater');
+        player.setCollideWorldBounds(true);     // プレイヤーが画面外にはみ出ないための処理
+
+        // プレイヤーのサイズを縮めている
+        player.scaleX = player.scaleX / 2;
+        player.scaleY = player.scaleY / 2;
     }
 
     function update() {
