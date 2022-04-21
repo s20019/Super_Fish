@@ -70,7 +70,36 @@
     }
 
     function update() {
+        let cursors = this.input.keyboard.createCursorKeys();
 
+        // 「 ↑ 」が押されているとき
+        if (cursors.up.isDown) {
+            player.setVelocityY(-200);
+            player.anims.play('up', true);
+        }
+        // 「 ↓ 」が押されているとき
+        else if (cursors.down.isDown) {
+            player.setVelocityY(200);
+            player.anims.play('down', true);
+        }
+        // 入力が無い時には停止する処理
+        else {
+            player.setVelocityY(0);
+        }
+
+        // 「 ← 」が押されているとき
+        if (cursors.left.isDown) {
+            player.setVelocityX(-200);
+            player.anims.play('left', true);
+        }
+        // 「 → 」が押されているとき
+        else if (cursors.right.isDown) {
+            player.setVelocityX(200);
+            player.anims.play('right', true);
+        }
+        else {
+            player.setVelocityX(0);
+        }
     }
 
 </script>
