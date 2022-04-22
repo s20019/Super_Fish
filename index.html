@@ -2,17 +2,20 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>ドリームフィッシュ</title>
+    <title>スーパーフィッシュ</title>
     <script src="src/phaser.js"></script>
 </head>
 <body>
 
 <script type="text/javascript">
 
+    const WIDTH = 1300;
+    const HEIGHT = 600;
+
     const config = {
         type: Phaser.AUTO,
-        width: 1200,
-        height: 600,
+        width: WIDTH,
+        height: HEIGHT,
         physics: {
             default: 'arcade',
             arcade: {
@@ -38,7 +41,7 @@
         this.load.image('sea', 'assets/sea.png');
         this.load.image('ebi', 'assets/ebi.png');
         this.load.image('buri', 'assets/buri.png');
-        this.load.image('eater', 'assets/eater.png');
+        this.load.image('toami', 'assets/toami.png');
         this.load.image('iwashi', 'assets/iwashi.png');
         this.load.image('hirame', 'assets/hirame.png');
         this.load.image('kawahagi', 'assets/kawahagi.png');
@@ -48,25 +51,37 @@
     function create() {
         this.add.image(600, 300, 'sea');
 
+        // 網
+        toami = this.physics.add.staticGroup();
+        toami.create(80, 300, 'toami').setScale(1.5, 2.5).refreshBody();
+
+        // 魚たちを１つにまとめるためのグループ
+        let fishGroup = this.physics.add.group();
+
         // イワシ
-        iwashi = this.physics.add.sprite(1200, 300, 'iwashi');
+        iwashi = fishGroup.create(WIDTH, 300, 'iwashi');
         iwashi.setVelocityX(-150);
-        iwashi.scaleX = iwashi.scaleX / 10;
-        iwashi.scaleY = iwashi.scaleY / 10;
+        iwashi.scaleX = iwashi.scaleX / 8;
+        iwashi.scaleY = iwashi.scaleY / 8;
 
         // ヒラメ
-        hirame = this.physics.add.sprite(1200, 100, 'hirame');
-        hirame.setVelocityX(-100);
-        hirame.scaleX = hirame.scaleX / 5;
-        hirame.scaleY = hirame.scaleY / 5;
+        hirame = fishGroup.create(WIDTH, 100, 'hirame');
+        hirame.setVelocityX(-200);
+        hirame.scaleX = hirame.scaleX / 7;
+        hirame.scaleY = hirame.scaleY / 7;
 
 
-        player = this.physics.add.sprite(300, 300, 'eater');
+        player = this.physics.add.sprite(400, 300, 'kumanomi');
         player.setCollideWorldBounds(true);     // プレイヤーが画面外にはみ出ないための処理
 
         // プレイヤーのサイズを縮めている
-        player.scaleX = player.scaleX / 2;
-        player.scaleY = player.scaleY / 2;
+        player.scaleX = player.scaleX / 3.5;
+        player.scaleY = player.scaleY / 3.5;
+
+        this.physics.add.collider(player, fishGroup);
+
+        this.physics.add.overlap(player, fishGroup, eatFish, null, this);
+        this.physics.add.overlap(fishGroup, toami, catchFish, null, this);
     }
 
     function update() {
@@ -74,12 +89,12 @@
 
         // 「 ↑ 」が押されているとき
         if (cursors.up.isDown) {
-            player.setVelocityY(-200);
+            player.setVelocityY(-300);
             player.anims.play('up', true);
         }
         // 「 ↓ 」が押されているとき
         else if (cursors.down.isDown) {
-            player.setVelocityY(200);
+            player.setVelocityY(300);
             player.anims.play('down', true);
         }
         // 入力が無い時には停止する処理
@@ -89,17 +104,30 @@
 
         // 「 ← 」が押されているとき
         if (cursors.left.isDown) {
-            player.setVelocityX(-200);
+            player.setVelocityX(-300);
             player.anims.play('left', true);
         }
         // 「 → 」が押されているとき
         else if (cursors.right.isDown) {
-            player.setVelocityX(200);
+            player.setVelocityX(300);
             player.anims.play('right', true);
         }
         else {
             player.setVelocityX(0);
         }
+    }
+
+    // 魚を食べた時の処理
+    function eatFish (player, fish) {
+        player.scaleX = player.scaleX * 1.08;
+        player.scaleY = player.scaleY * 1.08;
+
+        fish.destroy();
+    }
+
+    // 魚が網に捕まった時の処理
+    function catchFish (fish) {
+        fish.destroy();
     }
 
 </script>
