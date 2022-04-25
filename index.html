@@ -33,7 +33,13 @@
 
     let player;
     let platforms;
+    let fishGroup;
     let iwashi;
+    let life = 3;
+    let score = 0;
+    let scoreText;
+    let lifeCount = 3;
+
 
     const game = new Phaser.Game(config);
 
@@ -42,6 +48,7 @@
         this.load.image('ebi', 'assets/ebi.png');
         this.load.image('buri', 'assets/buri.png');
         this.load.image('toami', 'assets/toami.png');
+        this.load.image('heart', 'assets/heart.png');
         this.load.image('iwashi', 'assets/iwashi.png');
         this.load.image('hirame', 'assets/hirame.png');
         this.load.image('kawahagi', 'assets/kawahagi.png');
@@ -50,13 +57,16 @@
 
     function create() {
         this.add.image(600, 300, 'sea');
+        heart1 = this.add.image(1200, 570, 'heart').setScale(1 / 8);
+        heart2 = this.add.image(1150, 570, 'heart').setScale(1 / 8);
+        heart3 = this.add.image(1100, 570, 'heart').setScale(1 / 8);
 
         // 網
         toami = this.physics.add.staticGroup();
         toami.create(80, 300, 'toami').setScale(1.5, 2.5).refreshBody();
 
         // 魚たちを１つにまとめるためのグループ
-        let fishGroup = this.physics.add.group();
+        fishGroup = this.physics.add.group();
 
         // イワシ
         iwashi = fishGroup.create(WIDTH, 300, 'iwashi');
@@ -67,18 +77,28 @@
         // ヒラメ
         hirame = fishGroup.create(WIDTH, 100, 'hirame');
         hirame.setVelocityX(-200);
-        hirame.scaleX = hirame.scaleX / 7;
-        hirame.scaleY = hirame.scaleY / 7;
+        hirame.scaleX = hirame.scaleX / 5;
+        hirame.scaleY = hirame.scaleY / 5;
 
+        // エビ
+        ebi = fishGroup.create(WIDTH, 200, 'ebi');
+        ebi.setVelocityX(-170);
+        ebi.scaleX = ebi.scaleX / 20;
+        ebi.scaleY = ebi.scaleY / 20;
 
         player = this.physics.add.sprite(400, 300, 'kumanomi');
-        player.setCollideWorldBounds(true);     // プレイヤーが画面外にはみ出ないための処理
+
+        // プレイヤーが画面外にはみ出ないための処理
+        player.setCollideWorldBounds(true);
 
         // プレイヤーのサイズを縮めている
-        player.scaleX = player.scaleX / 3.5;
-        player.scaleY = player.scaleY / 3.5;
+        player.scaleX = player.scaleX / 4;
+        player.scaleY = player.scaleY / 4;
 
-        this.physics.add.collider(player, fishGroup);
+        //this.physics.add.collider(player, fishGroup);
+
+        // スコア
+        scoreText = this.add.text(15, 550, 'スコア： 0', { fontSize: '32px', fill: '#fff' });
 
         this.physics.add.overlap(player, fishGroup, eatFish, null, this);
         this.physics.add.overlap(fishGroup, toami, catchFish, null, this);
@@ -119,15 +139,41 @@
 
     // 魚を食べた時の処理
     function eatFish (player, fish) {
-        player.scaleX = player.scaleX * 1.08;
-        player.scaleY = player.scaleY * 1.08;
+        // プレイヤーが他の魚よりも大きい場合は食べれる
+        if (player.scale >= fish.scale) {
+            player.scaleX = player.scaleX * 1.08;
+            player.scaleY = player.scaleY * 1.08;
 
-        fish.destroy();
+            fish.destroy();
+
+            score += 10;
+            scoreText.setText('スコア： ' + score);
+        }
+        // プレイヤーが小さい場合は衝突する
+        else {
+            this.physics.add.collider(player, fish);
+        }
     }
 
     // 魚が網に捕まった時の処理
     function catchFish (fish) {
         fish.destroy();
+
+        // ライフ = ３
+        if (lifeCount === 3) {
+            heart3.destroy();
+            lifeCount -= 1;
+        }
+        // ライフ = ２
+        else if (lifeCount === 2) {
+            heart2.destroy();
+            lifeCount -= 1;
+        }
+        // ライフ = １
+        else if (lifeCount === 1) {
+            heart1.destroy();
+        }
+
     }
 
 </script>
