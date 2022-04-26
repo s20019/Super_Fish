@@ -27,14 +27,15 @@
         scene: {
             preload: preload,
             create: create,
-            update: update
+            update: update,
+            restart: restart
         }
     };
 
     let player;
     let platforms;
 
-
+    let heart;
     let heart1;
     let heart2;
     let heart3;
@@ -43,6 +44,7 @@
     let iwashi;
     let toami;
     let hirame;
+    let buri;
     let ebi;
 
     let score = 0;
@@ -52,6 +54,8 @@
     let life = 3;
 
     let gameOver = false;
+    let gameOverText;
+    let spaceText;
 
     const game = new Phaser.Game(config);
 
@@ -69,9 +73,11 @@
 
     function create() {
         this.add.image(600, 300, 'sea');
-        heart1 = this.add.image(1200, 570, 'heart').setScale(1 / 8);
-        heart2 = this.add.image(1150, 570, 'heart').setScale(1 / 8);
-        heart3 = this.add.image(1100, 570, 'heart').setScale(1 / 8);
+
+        heart = this.physics.add.staticGroup();
+        heart1 = heart.create(1200, 570, 'heart').setScale(1 / 8);
+        heart2 = heart.create(1150, 570, 'heart').setScale(1 / 8);
+        heart3 = heart.create(1100, 570, 'heart').setScale(1 / 8);
 
         // 網
         toami = this.physics.add.staticGroup();
@@ -98,14 +104,15 @@
         ebi.scaleX = ebi.scaleX / 20;
         ebi.scaleY = ebi.scaleY / 20;
 
-        player = this.physics.add.sprite(400, 500, 'kumanomi');
+        // プレイヤー
+        player = this.physics.add.sprite(400, 300, 'kumanomi');
 
         // プレイヤーが画面外にはみ出ないための処理
         player.setCollideWorldBounds(true);
 
         // プレイヤーのサイズを縮めている
-        player.scaleX = player.scaleX / 4;
-        player.scaleY = player.scaleY / 4;
+        player.scaleX = player.scaleX / 5;
+        player.scaleY = player.scaleY / 5;
 
         //this.physics.add.collider(player, fishGroup);
 
@@ -117,11 +124,16 @@
     }
 
     function update() {
+        let cursors = this.input.keyboard.createCursorKeys();
+
         if (gameOver) {
+            if (cursors.space.isDown) {
+                restart();
+
+                this.physics.resume();
+            }
             return;
         }
-
-        let cursors = this.input.keyboard.createCursorKeys();
 
         // 「 ↑ 」が押されているとき
         if (cursors.up.isDown) {
@@ -153,6 +165,28 @@
         }
     }
 
+    function restart() {
+        gameOver = false
+
+        gameOverText.setText('');
+        spaceText.setText('');
+
+        score = 0;
+        scoreText.setText('スコア： ' + score).setOrigin(0);
+
+        fishGroup.children.iterate(function (fish) {
+            fish.enableBody(true, WIDTH, fish.y, true, true);
+        });
+
+        iwashi.setVelocityX(-150);
+        ebi.setVelocityX(-170);
+        hirame.setVelocityX(-200);
+
+        heart1 = heart.create(1200, 570, 'heart').setScale(1 / 8);
+        heart2 = heart.create(1150, 570, 'heart').setScale(1 / 8);
+        heart3 = heart.create(1100, 570, 'heart').setScale(1 / 8);
+    }
+
     // 魚を食べた時の処理
     function eatFish (player, fish) {
         // プレイヤーが他の魚よりも大きい場合は食べれる
@@ -160,7 +194,7 @@
             player.scaleX = player.scaleX * 1.08;
             player.scaleY = player.scaleY * 1.08;
 
-            fish.destroy();
+            fish.disableBody(true, true);
 
             score += 10;
             scoreText.setText('スコア： ' + score);
@@ -173,24 +207,26 @@
 
     // 魚が網に捕まった時の処理
     function catchFish (fish) {
-        fish.destroy();
+        fish.disableBody(true, true);
 
         // ライフ = ３
         if (lifeCount === 3) {
-            heart3.destroy();
+            heart3.disableBody(true, true);
             lifeCount -= 1;
         }
         // ライフ = ２
         else if (lifeCount === 2) {
-            heart2.destroy();
+            heart2.disableBody(true, true);
             lifeCount -= 1;
         }
         // ライフ = １
         else if (lifeCount === 1) {
-            heart1.destroy();
+            heart1.disableBody(true, true);
+            lifeCount = 3;
 
             // 「GAME OVER」とスコアを、ライフが０になったタイミングで表示する
-            this.add.text(550, 250, 'GAME OVER', { fontSize: 50, fill: '#f23' })
+            gameOverText = this.add.text(550, 250, 'GAME OVER', { fontSize: 50, fill: '#f23' })
+            spaceText = this.add.text(610, 380, 'Space で再開', {fontSize: 25, fill: '#fff'});
             scoreText.setOrigin(-3.5, 7);
 
             gameOver = true;
