@@ -33,13 +33,25 @@
 
     let player;
     let platforms;
+
+
+    let heart1;
+    let heart2;
+    let heart3;
+
     let fishGroup;
     let iwashi;
-    let life = 3;
+    let toami;
+    let hirame;
+    let ebi;
+
     let score = 0;
     let scoreText;
-    let lifeCount = 3;
 
+    let lifeCount = 3;
+    let life = 3;
+
+    let gameOver = false;
 
     const game = new Phaser.Game(config);
 
@@ -86,7 +98,7 @@
         ebi.scaleX = ebi.scaleX / 20;
         ebi.scaleY = ebi.scaleY / 20;
 
-        player = this.physics.add.sprite(400, 300, 'kumanomi');
+        player = this.physics.add.sprite(400, 500, 'kumanomi');
 
         // プレイヤーが画面外にはみ出ないための処理
         player.setCollideWorldBounds(true);
@@ -105,6 +117,10 @@
     }
 
     function update() {
+        if (gameOver) {
+            return;
+        }
+
         let cursors = this.input.keyboard.createCursorKeys();
 
         // 「 ↑ 」が押されているとき
@@ -149,7 +165,7 @@
             score += 10;
             scoreText.setText('スコア： ' + score);
         }
-        // プレイヤーが小さい場合は衝突する
+        // プレイヤーの方が小さい場合は衝突する
         else {
             this.physics.add.collider(player, fish);
         }
@@ -172,8 +188,13 @@
         // ライフ = １
         else if (lifeCount === 1) {
             heart1.destroy();
-        }
 
+            // 「GAME OVER」とスコアを、ライフが０になったタイミングで表示する
+            this.add.text(550, 250, 'GAME OVER', { fontSize: 50, fill: '#f23' })
+            scoreText.setOrigin(-3.5, 7);
+
+            gameOver = true;
+        }
     }
 
 </script>
