@@ -114,8 +114,6 @@
         player.scaleX = player.scaleX / 5;
         player.scaleY = player.scaleY / 5;
 
-        //this.physics.add.collider(player, fishGroup);
-
         // スコア
         scoreText = this.add.text(15, 550, 'スコア： 0', { fontSize: '32px', fill: '#fff' });
 
@@ -166,14 +164,18 @@
     }
 
     function restart() {
+        // ゲームオーバーフラグをもとに戻す
         gameOver = false
 
+        // テキストを非表示
         gameOverText.setText('');
         spaceText.setText('');
 
+        // スコアをリセット
         score = 0;
         scoreText.setText('スコア： ' + score).setOrigin(0);
 
+        // 魚たちを元の位置に戻す
         fishGroup.children.iterate(function (fish) {
             fish.enableBody(true, WIDTH, fish.y, true, true);
         });
@@ -182,9 +184,10 @@
         ebi.setVelocityX(-170);
         hirame.setVelocityX(-200);
 
-        heart1 = heart.create(1200, 570, 'heart').setScale(1 / 8);
-        heart2 = heart.create(1150, 570, 'heart').setScale(1 / 8);
-        heart3 = heart.create(1100, 570, 'heart').setScale(1 / 8);
+        // ライフを再表示
+        heart1.enableBody(true, heart1.x, heart1.y, true, true);
+        heart2.enableBody(true, heart2.x, heart2.y, true, true);
+        heart3.enableBody(true, heart3.x, heart3.y, true, true);
     }
 
     // 魚を食べた時の処理
@@ -224,11 +227,12 @@
             heart1.disableBody(true, true);
             lifeCount = 3;
 
-            // 「GAME OVER」とスコアを、ライフが０になったタイミングで表示する
+            // ３つのテキストを、ライフが０になったタイミングで表示する
             gameOverText = this.add.text(550, 250, 'GAME OVER', { fontSize: 50, fill: '#f23' })
             spaceText = this.add.text(610, 380, 'Space で再開', {fontSize: 25, fill: '#fff'});
             scoreText.setOrigin(-3.5, 7);
 
+            // ライフが０になるとゲームオーバーフラグが立つ
             gameOver = true;
         }
     }
