@@ -175,6 +175,9 @@
         score = 0;
         scoreText.setText('スコア： ' + score).setOrigin(0);
 
+        // プレイヤーを元の位置に戻す
+        player.enableBody(true, 400, 300, true, true);
+
         // 魚たちを元の位置に戻す
         fishGroup.children.iterate(function (fish) {
             fish.enableBody(true, WIDTH, fish.y, true, true);
@@ -224,6 +227,9 @@
         }
         // ライフ = １
         else if (lifeCount === 1) {
+            // 物理法則を一時停止
+            this.physics.pause();
+
             heart1.disableBody(true, true);
             lifeCount = 3;
 
