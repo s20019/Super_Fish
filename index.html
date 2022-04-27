@@ -94,7 +94,7 @@
 
         // ヒラメ
         hirame = fishGroup.create(WIDTH, 100, 'hirame');
-        hirame.setVelocityX(-200);
+        hirame.setVelocityX(-300);
         hirame.scaleX = hirame.scaleX / 5;
         hirame.scaleY = hirame.scaleY / 5;
 
@@ -111,7 +111,7 @@
         player.setCollideWorldBounds(true);
 
         // プレイヤーのサイズを縮めている
-        player.scaleX = player.scaleX / 5;
+        player.scaleX = player.scaleX / 6;
         player.scaleY = player.scaleY / 5;
 
         // スコア
@@ -185,7 +185,7 @@
 
         iwashi.setVelocityX(-150);
         ebi.setVelocityX(-170);
-        hirame.setVelocityX(-200);
+        hirame.setVelocityX(-300);
 
         // ライフを再表示
         heart1.enableBody(true, heart1.x, heart1.y, true, true);
@@ -197,6 +197,7 @@
     function eatFish (player, fish) {
         // プレイヤーが他の魚よりも大きい場合は食べれる
         if (player.scale >= fish.scale) {
+            // 食べると体が大きくなる
             player.scaleX = player.scaleX * 1.08;
             player.scaleY = player.scaleY * 1.08;
 
