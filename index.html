@@ -42,7 +42,7 @@
 
     let fishGroup;
     let iwashi;
-    let toami;
+    let ami;
     let hirame;
     let buri;
     let ebi;
@@ -62,8 +62,8 @@
     function preload() {
         this.load.image('sea', 'assets/sea.png');
         this.load.image('ebi', 'assets/ebi.png');
+        this.load.image('ami', 'assets/ami.png');
         this.load.image('buri', 'assets/buri.png');
-        this.load.image('toami', 'assets/toami.png');
         this.load.image('heart', 'assets/heart.png');
         this.load.image('iwashi', 'assets/iwashi.png');
         this.load.image('hirame', 'assets/hirame.png');
@@ -80,8 +80,8 @@
         heart3 = heart.create(1100, 570, 'heart').setScale(1 / 8);
 
         // 網
-        toami = this.physics.add.staticGroup();
-        toami.create(80, 300, 'toami').setScale(1.5, 2.5).refreshBody();
+        ami = this.physics.add.staticGroup();
+        ami.create(80, 300, 'ami').setScale(2 / 3).refreshBody();
 
         // 魚たちを１つにまとめるためのグループ
         fishGroup = this.physics.add.group();
@@ -118,7 +118,7 @@
         scoreText = this.add.text(15, 550, 'スコア： 0', { fontSize: '32px', fill: '#fff' });
 
         this.physics.add.overlap(player, fishGroup, eatFish, null, this);
-        this.physics.add.overlap(fishGroup, toami, catchFish, null, this);
+        this.physics.add.overlap(fishGroup, ami, catchFish, null, this);
     }
 
     function update() {
