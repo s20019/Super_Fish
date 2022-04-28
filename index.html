@@ -50,6 +50,7 @@
 
     let score = 0;
     let scoreText;
+    let resultScore;
 
     let lifeCount = 3;
     let life = 3;
@@ -182,11 +183,12 @@
 
         // テキストを非表示
         gameOverText.setText('');
+        resultScore.setText('');
         spaceText.setText('');
 
         // スコアをリセット
         score = 0;
-        scoreText.setText('スコア： ' + score).setOrigin(0);
+        scoreText.setOrigin(0);
 
         // プレイヤーを元の位置に戻す
         player.enableBody(true, 400, 300, true, true);
@@ -280,9 +282,12 @@
             lifeCount = 3;
 
             // ３つのテキストを、ライフが０になったタイミングで表示する
-            gameOverText = this.add.text(550, 250, 'GAME OVER', { fontSize: 50, fill: '#f23' })
-            spaceText = this.add.text(610, 380, 'Space で再開', {fontSize: 25, fill: '#fff'});
-            scoreText.setOrigin(-3.5, 7);
+            gameOverText = this.add.text(550, 250, 'GAME OVER', { fontSize: 50, fill: '#f23' });
+            resultScore = this.add.text(600, 320, 'スコア： ' + score, { fontSize: 32, fill: '#fff' });
+            spaceText = this.add.text(610, 380, 'Space で再開', { fontSize: 25, fill: '#fff' });
+
+            // ゲームオーバー時のみ、スコアテキストを画面外へ移動
+            scoreText.setOrigin(2, -2);
 
             // ライフが０になるとゲームオーバーフラグが立つ
             gameOver = true;
