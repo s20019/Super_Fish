@@ -32,6 +32,7 @@
         }
     };
 
+    let ami;
     let player;
     let platforms;
 
@@ -42,9 +43,9 @@
 
     let fishGroup;
     let iwashi;
-    let ami;
     let hirame;
     let buri;
+    let hagi;
     let ebi;
 
     let score = 0;
@@ -67,7 +68,7 @@
         this.load.image('heart', 'assets/heart.png');
         this.load.image('iwashi', 'assets/iwashi.png');
         this.load.image('hirame', 'assets/hirame.png');
-        this.load.image('kawahagi', 'assets/kawahagi.png');
+        this.load.image('hagi', 'assets/nannyouhagi.png');
         this.load.image('kumanomi', 'assets/kumanomi.png');
     }
 
@@ -87,25 +88,37 @@
         fishGroup = this.physics.add.group();
 
         // イワシ
-        iwashi = fishGroup.create(WIDTH, 300, 'iwashi');
-        iwashi.setVelocityX(-150);
+        iwashi = fishGroup.create(Phaser.Math.Between(1500, 1700), Phaser.Math.Between(50, 550), 'iwashi');
+        iwashi.setVelocityX(Phaser.Math.Between(-400, -100));
         iwashi.scaleX = iwashi.scaleX / 8;
         iwashi.scaleY = iwashi.scaleY / 8;
 
         // ヒラメ
-        hirame = fishGroup.create(WIDTH, 100, 'hirame');
-        hirame.setVelocityX(-300);
-        hirame.scaleX = hirame.scaleX / 5;
-        hirame.scaleY = hirame.scaleY / 5;
+        hirame = fishGroup.create(Phaser.Math.Between(1500, 1700), Phaser.Math.Between(50, 550), 'hirame');
+        hirame.setVelocityX(Phaser.Math.Between(-400, -100));
+        hirame.scaleX = hirame.scaleX / 6;
+        hirame.scaleY = hirame.scaleY / 6;
+
+        // ナンヨウハギ
+        hagi = fishGroup.create(Phaser.Math.Between(1500, 1700), Phaser.Math.Between(50, 550), 'hagi');
+        hagi.setVelocityX(Phaser.Math.Between(-400, -100));
+        hagi.scaleX = hagi.scaleX / 9;
+        hagi.scaleY = hagi.scaleY / 9;
+
+        // ブリ
+        buri = fishGroup.create(Phaser.Math.Between(1500, 1700), Phaser.Math.Between(50, 550), 'buri');
+        buri.setVelocityX(Phaser.Math.Between(-400, -100));
+        buri.scaleX = buri.scaleX / 6;
+        buri.scaleY = buri.scaleY / 6;
 
         // エビ
-        ebi = fishGroup.create(WIDTH, 200, 'ebi');
-        ebi.setVelocityX(-170);
+        ebi = fishGroup.create(Phaser.Math.Between(1500, 1700), Phaser.Math.Between(50, 550), 'ebi');
+        ebi.setVelocityX(Phaser.Math.Between(-400, -100));
         ebi.scaleX = ebi.scaleX / 20;
         ebi.scaleY = ebi.scaleY / 20;
 
         // プレイヤー
-        player = this.physics.add.sprite(400, 300, 'kumanomi');
+        player = this.physics.add.sprite(500, 300, 'kumanomi');
 
         // プレイヤーが画面外にはみ出ないための処理
         player.setCollideWorldBounds(true);
@@ -178,14 +191,21 @@
         // プレイヤーを元の位置に戻す
         player.enableBody(true, 400, 300, true, true);
 
-        // 魚たちを元の位置に戻す
+        // 魚たちをランダムな地点から再スタートさせる
         fishGroup.children.iterate(function (fish) {
-            fish.enableBody(true, WIDTH, fish.y, true, true);
+            fish.enableBody(true,
+                Phaser.Math.Between(1400, 2000),
+                Phaser.Math.Between(50, 550),
+                true, true);
         });
 
-        iwashi.setVelocityX(-150);
-        ebi.setVelocityX(-170);
-        hirame.setVelocityX(-300);
+        // ランダムな速度で魚を泳がせる
+        iwashi.setVelocityX(Phaser.Math.Between(-400, -100));
+        hirame.setVelocityX(Phaser.Math.Between(-400, -100));
+        hagi.setVelocityX(Phaser.Math.Between(-400, -100));
+        buri.setVelocityX(Phaser.Math.Between(-400, -100));
+        ebi.setVelocityX(Phaser.Math.Between(-400, -100));
+
 
         // ライフを再表示
         heart1.enableBody(true, heart1.x, heart1.y, true, true);
@@ -195,26 +215,51 @@
 
     // 魚を食べた時の処理
     function eatFish (player, fish) {
-        // プレイヤーが他の魚よりも大きい場合は食べれる
-        if (player.scale >= fish.scale) {
-            // 食べると体が大きくなる
-            player.scaleX = player.scaleX * 1.08;
-            player.scaleY = player.scaleY * 1.08;
+        // 魚を非表示にする
+        fish.disableBody(true, true);
 
-            fish.disableBody(true, true);
+        // 魚がすべていなくなった場合
+        if (fishGroup.countActive(true) === 0) {
 
-            score += 10;
-            scoreText.setText('スコア： ' + score);
+            fishGroup.children.iterate(function (child) {
+                child.enableBody(
+                    true,
+                    Phaser.Math.Between(1300, 2000),
+                    Phaser.Math.Between(50, 550),
+                    true, true
+                );
+                iwashi.setVelocityX(Phaser.Math.Between(-400, -200));
+                hirame.setVelocityX(Phaser.Math.Between(-400, -200));
+                hagi.setVelocityX(Phaser.Math.Between(-400, -200));
+                buri.setVelocityX(Phaser.Math.Between(-400, -200));
+                ebi.setVelocityX(Phaser.Math.Between(-400, -200));
+            });
         }
-        // プレイヤーの方が小さい場合は衝突する
-        else {
-            this.physics.add.collider(player, fish);
-        }
+
+        score += 10;
+        scoreText.setText('スコア： ' + score);
     }
 
     // 魚が網に捕まった時の処理
     function catchFish (fish) {
         fish.disableBody(true, true);
+
+        if (fishGroup.countActive(true) === 0) {
+
+            fishGroup.children.iterate(function (child) {
+                child.enableBody(
+                    true,
+                    Phaser.Math.Between(1300, 2000),
+                    Phaser.Math.Between(50, 550),
+                    true, true
+                );
+                iwashi.setVelocityX(Phaser.Math.Between(-400, -200));
+                hirame.setVelocityX(Phaser.Math.Between(-400, -200));
+                hagi.setVelocityX(Phaser.Math.Between(-400, -200));
+                buri.setVelocityX(Phaser.Math.Between(-400, -200));
+                ebi.setVelocityX(Phaser.Math.Between(-400, -200));
+            });
+        }
 
         // ライフ = ３
         if (lifeCount === 3) {
